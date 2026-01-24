@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using UserService.Application.Features.CreateUser;
 using UserService.Application.Features.GetUser;
+using UserService.Application.Features.Queries;
 
 namespace UserService.Application
 {
@@ -17,6 +18,7 @@ namespace UserService.Application
             services.AddScoped<CreateUserHandler>();
             services.AddScoped<GetUserByIdHandler>();
             services.AddScoped<GetUserByNameHandler>();
+            services.AddScoped<ValidateCredentialsHandler>();
 
             return services;
         }

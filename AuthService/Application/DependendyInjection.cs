@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using AuthService.Application.Features.CreateVehicle;
-using AuthService.Application.Features.GetVehicle;
+using AuthService.Application.Features.Login;
 using AuthService.Application.Interfaces;
-using AuthService.Infraestructure;
+using AuthService.Application.ExternalServices;
+using AuthService.Application.Services;
+using AuthService.Infraestructure.Repositories;
 
 namespace AuthService.Application
 {
@@ -13,12 +13,19 @@ namespace AuthService.Application
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            // Register FluentValidation validators
-            //services.AddValidatorsFromAssemblyContaining<CreateVehicleCommandValidator>();
+            // Register Validators
+            services.AddValidatorsFromAssemblyContaining<LoginCommandValidator>();
 
             // Register Handlers
-            services.AddScoped<CreateVehicleHandler>();
-            services.AddScoped<GetVehicleByIdQueryHandler>();
+            services.AddScoped<LoginCommandHandler>();
+            services.AddScoped<RefreshTokenCommand>();
+
+            // Register Services
+            services.AddSingleton<JwtService>();
+            services.AddHttpClient<UserServiceClient>();
+
+            // Register Repositories
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
             return services;
         }

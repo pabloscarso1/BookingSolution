@@ -1,7 +1,10 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UserService.Api.Contracts;
+using UserService.Application.Features.CreateUser;
 using UserService.Application.Features.GetUser;
+using UserService.Application.Features.Queries;
 
 namespace UserService.Api.Controllers.V1
 {
@@ -10,21 +13,37 @@ namespace UserService.Api.Controllers.V1
     [Route("api/v{version:apiVersion}/[controller]")]
     public class UsersController : ControllerBase
     {
-        //[HttpPost]
-        //public async Task<IActionResult> Create(
-        //    [FromBody] CreateUserRequest request,
-        //    [FromServices] CreateUserHandler handler)
-        //{
-        //    var command = new CreateUserCommand(request.Name);
+        [HttpPost]
+        public async Task<IActionResult> Create(
+            [FromBody] CreateUserRequest request,
+            [FromServices] CreateUserHandler handler)
+        {
+            var command = new CreateUserCommand(request.Name, request.Password);
 
-        //    var result = await handler.Handle(command);
+            var result = await handler.Handle(command);
 
-        //    if (!result.IsSuccess)
-        //        return BadRequest(result.Error);
+            if (!result.IsSuccess)
+                return BadRequest(result.Error);
 
-        //    return Ok(result.Value?.Id);
-        //}
+            return Ok(result.Value);
+        }
 
+        [HttpPost("validate-credentials")]
+        public async Task<IActionResult> ValidateCredentials(
+            [FromBody] ValidateCredentialsRequest request,
+            [FromServices] ValidateCredentialsHandler handler)
+        {
+            var query = new ValidateCredentialsQuery(request.Name, request.Password);
+
+            var result = await handler.Handle(query);
+
+            if (!result.IsSuccess)
+                return Unauthorized(new { error = result.Error });
+
+            return Ok(new { message = "Credenciales válidas", user = result.Value });
+        }
+
+        [Authorize]
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById(
             Guid id,

@@ -1,7 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using AuthService.Application.Features.CreateVehicle;
-using AuthService.Application.Features.GetVehicle;
-using AuthService.Application.Interfaces;
 using AuthService.Infraestructure.Persistence;
 
 namespace AuthService.Infraestructure
@@ -22,9 +19,6 @@ namespace AuthService.Infraestructure
                             maxRetryDelay: TimeSpan.FromSeconds(10),
                             errorCodesToAdd: null);
                     }));
-
-            services.AddScoped<IVehicleRepository, VehicleRepository>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             return services;
         }

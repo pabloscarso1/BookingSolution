@@ -8,7 +8,7 @@ using UserService.Application.Interfaces;
 
 namespace UserService.Application.Features.CreateUser
 {
-    public record CreateUserCommand(string Name);
+    public record CreateUserCommand(string Name, string Password);
 
     public class CreateUserHandler
     {
@@ -17,7 +17,7 @@ namespace UserService.Application.Features.CreateUser
         private readonly IValidator<CreateUserCommand> _validator;
 
         public CreateUserHandler(
-            IUserRepository repository, 
+            IUserRepository repository,
             IUnitOfWork uof,
             IValidator<CreateUserCommand> validator)
         {
@@ -31,18 +31,28 @@ namespace UserService.Application.Features.CreateUser
             // Validar el comando
             return await _validator.ValidateAndExecuteAsync(command, async () =>
             {
-                var existing = _repository.GetAsync(x => x.Name == command.Name);
+                var existing = await _repository.GetAsync(x => x.Name == command.Name);
 
                 if (existing is not null)
                     return Result<UserDto>.Failure("USER_ALREADY_EXISTS");
 
-                var user = new User(command.Name);
+                // Hashear la contraseña
+                var passwordHash = HashPassword(command.Password);
+
+                var user = new User(command.Name, passwordHash);
 
                 await _repository.AddAsync(user);
                 await _unitOfWork.SaveChangesAsync();
 
                 return Result<UserDto>.Success(new UserDto(user.Id, user.Name));
             });
+        }
+
+        private static string HashPassword(string password)
+        {
+            using var sha256 = SHA256.Create();
+            var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+            return Convert.ToBase64String(hashedBytes);
         }
     }
 
@@ -57,6 +67,12 @@ namespace UserService.Application.Features.CreateUser
                 .WithMessage("El nombre debe tener al menos 3 caracteres")
                 .MaximumLength(100)
                 .WithMessage("El nombre no puede exceder los 100 caracteres");
+
+            RuleFor(x => x.Password)
+                .NotEmpty()
+                .WithMessage("La contraseña es requerida")
+                .MinimumLength(5)
+                .WithMessage("La contraseña debe tener al menos 5 caracteres");
         }
     }
 }
