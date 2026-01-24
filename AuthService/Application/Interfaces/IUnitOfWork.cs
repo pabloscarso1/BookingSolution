@@ -1,0 +1,7 @@
+﻿namespace AuthService.Application.Interfaces
+{
+    public interface IUnitOfWork
+    {
+        Task<int> SaveChangesAsync();
+    }
+}

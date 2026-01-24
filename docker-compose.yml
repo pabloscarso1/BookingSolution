@@ -1,6 +1,20 @@
 services:
 
   # =========================
+  # POSTGRES SERVER
+  # =========================
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 250195
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  # =========================
   # USER SERVICE
   # =========================
   userservice:
@@ -12,22 +26,9 @@ services:
       - "8081:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: Host=users-db;Port=5432;Database=usersdb;Username=postgres;Password=postgres
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=usersdb;Username=postgres;Password=250195
     depends_on:
-      - users-db
-
-  # =========================
-  # USER DATABASE
-  # =========================
-  users-db:
-    image: postgres:16
-    container_name: users-db
-    environment:
-      POSTGRES_DB: usersdb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    volumes:
-      - users-db-data:/var/lib/postgresql/data
+      - postgres
 
   # =========================
   # VEHICLE SERVICE
@@ -41,27 +42,12 @@ services:
       - "8082:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: Host=vehicles-db;Port=5432;Database=vehiclesdb;Username=postgres;Password=postgres
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=vehiclesdb;Username=postgres;Password=250195
     depends_on:
-      - vehicles-db
-
-  # =========================
-  # VEHICLE DATABASE
-  # =========================
-  vehicles-db:
-    image: postgres:16
-    container_name: vehicles-db
-    environment:
-      POSTGRES_DB: vehiclesdb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    volumes:
-      - vehicles-db-data:/var/lib/postgresql/data
-
+      - postgres
 
 # =========================
-# VOLUMES (PERSISTENCIA)
+# VOLUMES
 # =========================
 volumes:
-  users-db-data:
-  vehicles-db-data:
+  postgres-data:

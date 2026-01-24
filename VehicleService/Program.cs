@@ -3,6 +3,7 @@ using FluentValidation;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.IO.Compression;
 using VehicleService.Api.Configuration;
@@ -12,6 +13,7 @@ using VehicleService.Api.Middleware;
 using VehicleService.Application;
 using VehicleService.Infraestructure;
 using VehicleService.Infraestructure.HealthCheck;
+using VehicleService.Infraestructure.Persistence;
 
 // Configurar Serilog
 Log.Logger = new LoggerConfiguration()
@@ -207,6 +209,12 @@ try
     {
         options.UIPath = "/health-ui";
     });
+
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        db.Database.Migrate();
+    }
 
     app.Run();
 }

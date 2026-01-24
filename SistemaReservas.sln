@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.2.11415.280 d18.0
+VisualStudioVersion = 18.2.11415.280
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService", "UserService\UserService.csproj", "{B8DCD4DE-72CF-47E2-A45C-CF85CC2AE248}"
 EndProject
@@ -11,8 +11,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleService", "VehicleSe
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A19BE1A0-E833-480A-8FDF-BAC7AB618C79}"
 	ProjectSection(SolutionItems) = preProject
+		docker-compose.dev.yml = docker-compose.dev.yml
 		docker-compose.yml = docker-compose.yml
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService", "AuthService\AuthService.csproj", "{6CDAB7B3-DE4F-6FF5-06F0-D824F083F1AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +35,10 @@ Global
 		{FD6375D4-C7B7-3D02-EAF0-8D295C52FB9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD6375D4-C7B7-3D02-EAF0-8D295C52FB9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD6375D4-C7B7-3D02-EAF0-8D295C52FB9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CDAB7B3-DE4F-6FF5-06F0-D824F083F1AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CDAB7B3-DE4F-6FF5-06F0-D824F083F1AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CDAB7B3-DE4F-6FF5-06F0-D824F083F1AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CDAB7B3-DE4F-6FF5-06F0-D824F083F1AF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

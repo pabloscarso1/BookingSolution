@@ -32,6 +32,6 @@
             => new(true, value, null);
 
         public static Result<T> Failure(string error, T? value = default)
-            => new(true, value, error);
+            => new(false, value, error);
     }
 }

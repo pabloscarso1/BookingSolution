@@ -11,10 +11,10 @@ WORKDIR /src
 COPY . .
 
 # Restauramos dependencias
-RUN dotnet restore UserService.csproj
+RUN dotnet restore UserService/UserService.csproj
 
 # Publicamos
-RUN dotnet publish UserService.csproj -c Release -o /app/publish
+RUN dotnet publish UserService/UserService.csproj -c Release -o /app/publish
 
 # 3️⃣ Imagen final
 FROM base AS final

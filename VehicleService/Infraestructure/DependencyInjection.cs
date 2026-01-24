@@ -14,7 +14,14 @@ namespace VehicleService.Infraestructure
         {
             services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(
-                    configuration.GetConnectionString("DefaultConnection")));
+                    configuration.GetConnectionString("DefaultConnection"),
+                    npgsql =>
+                    {
+                        npgsql.EnableRetryOnFailure(
+                            maxRetryCount: 5,
+                            maxRetryDelay: TimeSpan.FromSeconds(10),
+                            errorCodesToAdd: null);
+                    }));
 
             services.AddScoped<IVehicleRepository, VehicleRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();

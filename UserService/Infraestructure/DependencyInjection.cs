@@ -12,7 +12,14 @@ namespace UserService.Infraestructure
         {
             services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(
-                    configuration.GetConnectionString("DefaultConnection")));
+                    configuration.GetConnectionString("DefaultConnection"),
+                    npgsql =>
+                    {
+                        npgsql.EnableRetryOnFailure(
+                            maxRetryCount: 5,
+                            maxRetryDelay: TimeSpan.FromSeconds(10),
+                            errorCodesToAdd: null);
+                    }));
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();

@@ -11,10 +11,10 @@ WORKDIR /src
 COPY . .
 
 # Restauramos dependencias
-RUN dotnet restore VehicleService.csproj
+RUN dotnet restore VehicleService/VehicleService.csproj
 
 # Publicamos
-RUN dotnet publish VehicleService.csproj -c Release -o /app/publish
+RUN dotnet publish VehicleService/VehicleService.csproj -c Release -o /app/publish
 
 # 3️⃣ Imagen final
 FROM base AS final

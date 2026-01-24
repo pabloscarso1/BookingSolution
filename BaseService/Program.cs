@@ -6,10 +6,12 @@ using BaseService.Api.Middleware;
 using BaseService.Application;
 using BaseService.Infraestructure;
 using BaseService.Infraestructure.HealthCheck;
+using BaseService.Infraestructure.Persistence;
 using FluentValidation;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.IO.Compression;
 
@@ -204,6 +206,12 @@ try
     {
         options.UIPath = "/health-ui";
     });
+
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        db.Database.Migrate();
+    }
 
     app.Run();
 }
