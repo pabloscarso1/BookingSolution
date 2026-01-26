@@ -14,6 +14,7 @@ using AuthService.Application;
 using AuthService.Infraestructure;
 using AuthService.Infraestructure.HealthCheck;
 using AuthService.Infraestructure.Persistence;
+using Microsoft.OpenApi;
 
 // Configurar Serilog
 Log.Logger = new LoggerConfiguration()
@@ -49,7 +50,14 @@ try
 
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
+    builder.Services.AddSwaggerGen(options =>
+    {
+        options.SwaggerDoc("v1", new OpenApiInfo
+        {
+            Title = "AuthService API",
+            Version = "v1"
+        });
+    });
     builder.Services.AddApplication(builder.Configuration);
     builder.Services.AddInfrastructure(builder.Configuration);
 
