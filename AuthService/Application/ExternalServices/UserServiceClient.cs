@@ -39,6 +39,7 @@ namespace AuthService.Application.ExternalServices
                     return null;
                 }
 
+
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 var result = JsonSerializer.Deserialize<UserCredentialsResponse>(responseContent, options);

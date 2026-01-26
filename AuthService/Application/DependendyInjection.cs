@@ -14,11 +14,11 @@ namespace AuthService.Application
             IConfiguration configuration)
         {
             // Register Validators
-            services.AddValidatorsFromAssemblyContaining<LoginCommandValidator>();
+            //services.AddValidatorsFromAssemblyContaining<LoginCommandValidator>();
 
             // Register Handlers
             services.AddScoped<LoginCommandHandler>();
-            services.AddScoped<RefreshTokenCommand>();
+            services.AddScoped<RefreshTokenCommandHandler>();
 
             // Register Services
             services.AddSingleton<JwtService>();

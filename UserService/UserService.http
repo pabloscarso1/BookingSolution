@@ -1,6 +1,44 @@
-@UserService_HostAddress = http://localhost:5208
+@authUrl = http://localhost:5003
+@userServiceUrl = http://localhost:5001
+@contentType = application/json
 
-GET {{UserService_HostAddress}}/weatherforecast/
-Accept: application/json
+### Login (from AuthService)
+POST {{authUrl}}/api/v1/auth/login
+Content-Type: {{contentType}}
 
-###
+{
+  "name": "pablo",
+  "password": "password123"
+}
+
+### Debug - Check Token Info (paste your token here)
+GET {{userServiceUrl}}/api/v1/debug/token-info
+Authorization: Bearer YOUR_ACCESS_TOKEN_HERE
+Accept: {{contentType}}
+
+### Get User by ID (requires Authorization - copy accessToken from login response)
+GET {{userServiceUrl}}/api/v1/users/7ff195de-fcc1-4c8b-b0d2-96a6913609f5?id=7ff195de-fcc1-4c8b-b0d2-96a6913609f5
+Authorization: Bearer YOUR_ACCESS_TOKEN_HERE
+Accept: {{contentType}}
+
+### Get User by Name (no authorization required)
+GET {{userServiceUrl}}/api/v1/users/by-name/pablo
+Accept: {{contentType}}
+
+### Create User
+POST {{userServiceUrl}}/api/v1/users
+Content-Type: {{contentType}}
+
+{
+  "name": "pablo",
+  "password": "password123"
+}
+
+### Validate Credentials
+POST {{userServiceUrl}}/api/v1/users/validate-credentials
+Content-Type: {{contentType}}
+
+{
+  "name": "pablo",
+  "password": "password123"
+}

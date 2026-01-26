@@ -6,5 +6,6 @@ namespace AuthService.Application.Dtos
         public string RefreshToken { get; set; } = string.Empty;
         public int ExpiresIn { get; set; } // en segundos
         public string TokenType { get; set; } = "Bearer";
+        public Guid UserId { get; set; }
     }
 }

@@ -45,7 +45,24 @@ services:
       ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=vehiclesdb;Username=postgres;Password=250195
     depends_on:
       - postgres
-
+      
+  # =========================
+  # AUTH SERVICE
+  # =========================
+  authservice:
+    build:
+      context: .
+      dockerfile: AuthService/Dockerfile
+    container_name: authservice
+    ports:
+      - "8083:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=auth_db;Username=postgres;Password=250195
+      ExternalServices__UserService__Url: http://userservice:8081
+    depends_on:
+      - postgres
+      - userservice
 # =========================
 # VOLUMES
 # =========================

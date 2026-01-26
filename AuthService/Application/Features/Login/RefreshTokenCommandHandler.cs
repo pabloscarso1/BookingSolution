@@ -10,15 +10,18 @@ namespace AuthService.Application.Features.Login
         private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly JwtService _jwtService;
         private readonly ILogger<RefreshTokenCommandHandler> _logger;
+        private readonly IConfiguration _configuration;
 
         public RefreshTokenCommandHandler(
             IRefreshTokenRepository refreshTokenRepository,
             JwtService jwtService,
-            ILogger<RefreshTokenCommandHandler> logger)
+            ILogger<RefreshTokenCommandHandler> logger,
+            IConfiguration configuration)
         {
             _refreshTokenRepository = refreshTokenRepository;
             _jwtService = jwtService;
             _logger = logger;
+            _configuration = configuration;
         }
 
         public async Task<Result<AuthDto>> Handle(RefreshTokenCommand command)
@@ -48,11 +51,16 @@ namespace AuthService.Application.Features.Login
 
             _logger.LogInformation("Tokens refresheados exitosamente para usuario {UserId}", userId);
 
+            // Calcular ExpiresIn en segundos basado en la configuración
+            var jwtSettings = _configuration.GetSection("JwtSettings");
+            var expirationMinutes = int.Parse(jwtSettings["AccessTokenExpirationMinutes"] ?? "15");
+            var expiresIn = expirationMinutes * 60; // convertir a segundos
+
             var auth = new AuthDto
             {
                 AccessToken = newAccessToken,
                 RefreshToken = newRefreshToken,
-                ExpiresIn = 900,
+                ExpiresIn = expiresIn,
                 TokenType = "Bearer"
             };
 

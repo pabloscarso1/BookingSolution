@@ -17,19 +17,22 @@ namespace AuthService.Application.Features.Login
         private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly IValidator<LoginCommand> _validator;
         private readonly ILogger<LoginCommandHandler> _logger;
+        private readonly IConfiguration _configuration;
 
         public LoginCommandHandler(
             UserServiceClient userServiceClient,
             JwtService jwtService,
             IRefreshTokenRepository refreshTokenRepository,
             IValidator<LoginCommand> validator,
-            ILogger<LoginCommandHandler> logger)
+            ILogger<LoginCommandHandler> logger,
+            IConfiguration configuration)
         {
             _userServiceClient = userServiceClient;
             _jwtService = jwtService;
             _refreshTokenRepository = refreshTokenRepository;
             _validator = validator;
             _logger = logger;
+            _configuration = configuration;
         }
 
         public async Task<Result<AuthDto>> Handle(LoginCommand command)
@@ -67,12 +70,18 @@ namespace AuthService.Application.Features.Login
 
                 _logger.LogInformation("User {UserName} logged in successfully", command.Name);
                 
+                // Calcular ExpiresIn en segundos basado en la configuración
+                var jwtSettings = _configuration.GetSection("JwtSettings");
+                var expirationMinutes = int.Parse(jwtSettings["AccessTokenExpirationMinutes"] ?? "15");
+                var expiresIn = expirationMinutes * 60; // convertir a segundos
+                
                 var auth = new AuthDto
                 {
                     AccessToken = accessToken,
                     RefreshToken = refreshTokenValue,
-                    ExpiresIn = 900,
-                    TokenType = "Bearer"
+                    ExpiresIn = expiresIn,
+                    TokenType = "Bearer",
+                    UserId = userId
                 };
 
                 return Result<AuthDto>.Success(auth);

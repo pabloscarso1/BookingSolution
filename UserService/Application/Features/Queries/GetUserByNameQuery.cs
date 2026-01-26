@@ -5,7 +5,7 @@ using UserService.Application.Interfaces;
 
 namespace UserService.Application.Features.GetUser
 {
-    public record GetUserByNameQuery(string name);
+    public record GetUserByNameQuery(string Name);
 
     public class GetUserByNameHandler
     {
@@ -25,7 +25,7 @@ namespace UserService.Application.Features.GetUser
             // Validar el query
             return await _validator.ValidateAndExecuteAsync(query, async () =>
             {
-                var user = await _repository.GetAsync(x => x.Name == query.name);
+                var user = await _repository.GetAsync(x => x.Name == query.Name);
 
                 if (user is null)
                     return Result<UserDto>.Failure("USER_NOT_FOUND");
@@ -41,7 +41,7 @@ namespace UserService.Application.Features.GetUser
     {
         public GetUserByNameQueryValidator()
         {
-            RuleFor(x => x.name)
+            RuleFor(x => x.Name)
                 .NotEmpty()
                 .WithMessage("El nombre del usuario es requerido")
                 .MinimumLength(3)
