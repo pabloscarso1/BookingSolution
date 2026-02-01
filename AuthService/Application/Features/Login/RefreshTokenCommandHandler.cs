@@ -39,7 +39,13 @@ namespace AuthService.Application.Features.Login
                 return Result<AuthDto>.Failure("ACCESS_TOKEN_INVALID");
 
             var userIdClaim = principal.FindFirst("sub")?.Value;
-            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                var allClaims = string.Join(", ", principal.Claims.Select(c => $"{c.Type}={c.Value}"));
+                return Result<AuthDto>.Failure("USERID_NOT_FOUND");
+            }
+
+            if (!Guid.TryParse(userIdClaim, out var userId))
                 return Result<AuthDto>.Failure("USERID_NOT_FOUND");
 
             var newAccessToken = _jwtService.GenerateAccessToken(userId);
@@ -48,8 +54,6 @@ namespace AuthService.Application.Features.Login
             refreshToken.Token = newRefreshToken;
             refreshToken.ExpiresAt = DateTime.UtcNow.AddDays(7);
             await _refreshTokenRepository.UpdateAsync(refreshToken);
-
-            _logger.LogInformation("Tokens refresheados exitosamente para usuario {UserId}", userId);
 
             // Calcular ExpiresIn en segundos basado en la configuración
             var jwtSettings = _configuration.GetSection("JwtSettings");

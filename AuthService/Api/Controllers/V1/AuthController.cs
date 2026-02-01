@@ -35,9 +35,9 @@ namespace AuthService.Api.Controllers.V1
             if (!result.IsSuccess)
             {
                 if (string.Equals(result.Error, "INVALID_CREDENTIALS", StringComparison.OrdinalIgnoreCase))
-                    return Unauthorized(new { message = result.Error });
+                    return Unauthorized(result.Error);
 
-                return BadRequest(new { message = result.Error });
+                return BadRequest(result.Error);
             }
 
             return Ok(result.Value);
@@ -66,9 +66,9 @@ namespace AuthService.Api.Controllers.V1
                 // Map known errors to 401, others to 400
                 var unauthorizedErrors = new[] { "REFRESH_TOKEN_NOT_FOUND", "REFRESH_TOKEN_INVALID", "ACCESS_TOKEN_INVALID", "USERID_NOT_FOUND" };
                 if (result.Error != null && unauthorizedErrors.Contains(result.Error))
-                    return Unauthorized(new { message = result.Error });
+                    return Unauthorized(result.Error);
 
-                return BadRequest(new { message = result.Error });
+                return BadRequest(result.Error);
             }
 
             return Ok(result.Value);

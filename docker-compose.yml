@@ -13,6 +13,19 @@ services:
       POSTGRES_PASSWORD: 250195
     volumes:
       - postgres-data:/var/lib/postgresql/data
+ 
+  # =========================
+  # API GATEWAT
+  # =========================
+
+  api-gateway:
+    build: ./ApiGateway
+    ports:
+      - "5000:8080"
+    depends_on:
+      - auth-service
+      - user-service
+      - vehicle-service
 
   # =========================
   # USER SERVICE
@@ -27,6 +40,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=usersdb;Username=postgres;Password=250195
+      HealthChecksUI__HealthChecks__0__Uri: http://userservice:8080/health
     depends_on:
       - postgres
 
@@ -43,6 +57,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=vehiclesdb;Username=postgres;Password=250195
+      HealthChecksUI__HealthChecks__0__Uri: http://vehicleservice:8080/health
     depends_on:
       - postgres
       
@@ -59,7 +74,8 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=auth_db;Username=postgres;Password=250195
-      ExternalServices__UserService__Url: http://userservice:8081
+      ExternalServices__UserService__Url: http://userservice:8080
+      HealthChecksUI__HealthChecks__0__Uri: http://authservice:8080/health
     depends_on:
       - postgres
       - userservice

@@ -19,6 +19,7 @@ namespace VehicleService.Application
             // Register Handlers
             services.AddScoped<CreateVehicleHandler>();
             services.AddScoped<GetVehicleByIdQueryHandler>();
+            services.AddScoped<GetAllByUserIdQueryHandler>();
 
             return services;
         }

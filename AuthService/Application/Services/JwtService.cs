@@ -77,8 +77,31 @@ namespace AuthService.Application.Services
                 if (!(securityToken is JwtSecurityToken jwtSecurityToken) || 
                     !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
                 {
+                    _logger.LogWarning("Token validation failed: invalid security token or algorithm");
                     return null;
                 }
+
+                // Asegurar que los claims del JWT se incluyan en el principal
+                if (jwtSecurityToken.Claims != null && jwtSecurityToken.Claims.Any())
+                {
+                    var claimsIdentity = principal.Identity as ClaimsIdentity;
+                    if (claimsIdentity != null)
+                    {
+                        // Agregar claims del token al principal si no están presentes
+                        foreach (var claim in jwtSecurityToken.Claims)
+                        {
+                            if (!claimsIdentity.Claims.Any(c => c.Type == claim.Type && c.Value == claim.Value))
+                            {
+                                claimsIdentity.AddClaim(claim);
+                            }
+                        }
+                    }
+                }
+
+                // Log del claim 'sub' para debugging
+                var subClaim = principal?.FindFirst("sub")?.Value;
+                _logger.LogInformation("Token claims extracted. SubClaim: {SubClaim}, Total Claims: {ClaimsCount}", 
+                    subClaim ?? "NOT FOUND", principal?.Claims.Count() ?? 0);
 
                 return principal;
             }

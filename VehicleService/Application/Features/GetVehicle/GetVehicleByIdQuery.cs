@@ -31,7 +31,7 @@ namespace VehicleService.Application.Features.GetVehicle
                 if (obj is null)
                     return Result<VehicleDto>.Failure(new NotFoundException("vehicle").Message);
 
-                var dto = new VehicleDto(obj.Id, obj.UsuarioId, obj.Patent, obj.Model, obj.Year, obj.Color);
+                var dto = new VehicleDto(obj.Id, obj.UserId, obj.Patent, obj.Model, obj.Year, obj.Color);
 
                 return Result<VehicleDto>.Success(dto);
             });

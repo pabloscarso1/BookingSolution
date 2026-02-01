@@ -38,7 +38,7 @@ namespace VehicleService.Application.Features.CreateVehicle
                 await _repository.AddAsync(vehicle);
                 await _unitOfWork.SaveChangesAsync();
 
-                var vehicleDto = new VehicleDto(vehicle.Id, vehicle.UsuarioId, vehicle.Patent, vehicle.Model, vehicle.Year, vehicle.Color);
+                var vehicleDto = new VehicleDto(vehicle.Id, vehicle.UserId, vehicle.Patent, vehicle.Model, vehicle.Year, vehicle.Color);
                 return Result<VehicleDto>.Success(vehicleDto);
             });
         }

@@ -14,8 +14,6 @@ namespace AuthService.Infraestructure.Persistence
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
-            
             // Configure RefreshToken
             modelBuilder.Entity<RefreshToken>(entity =>
             {

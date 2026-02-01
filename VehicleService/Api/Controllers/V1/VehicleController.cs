@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VehicleService.Api.Contracts;
 using VehicleService.Application.Features.CreateVehicle;
@@ -17,6 +18,7 @@ namespace VehicleService.Api.Controllers.V1
         public VehicleController(IMapper mapper) => _mapper = mapper;
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Create(
             [FromBody] CreateVehicleRequest request,
             [FromServices] CreateVehicleHandler handler)
@@ -29,6 +31,20 @@ namespace VehicleService.Api.Controllers.V1
                 return BadRequest(result.Error);
 
             return Ok(result.Value?.Id);
+        }
+
+        [Authorize]
+        [HttpGet("GetAllByUserId/{userId:guid}")]
+        public async Task<IActionResult> GetAllByUserId(
+            Guid userId,
+            [FromServices] GetAllByUserIdQueryHandler handler)
+        {
+            var result = await handler.Handle(new GetAllByUserIdQuery(userId));
+
+            if (!result.IsSuccess)
+                return NotFound(result.Error);
+
+            return Ok(result.Value);
         }
 
         [HttpGet("{id:guid}")]
