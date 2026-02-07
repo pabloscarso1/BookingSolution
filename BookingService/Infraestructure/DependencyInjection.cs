@@ -21,7 +21,7 @@ namespace BookingService.Infraestructure
                             errorCodesToAdd: null);
                     }));
 
-            services.AddScoped<IBaseRepository, BookingRepository>();
+            services.AddScoped<IBookingRepository, BookingRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             return services;

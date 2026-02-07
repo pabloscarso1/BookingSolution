@@ -6,7 +6,7 @@ using BookingService.Infraestructure.Persistence;
 
 namespace BookingService.Infraestructure
 {
-    public class BaseRepository : IBaseRepository
+    public class BaseRepository : IBookingRepository
     {
         private readonly AppDbContext _context;
 

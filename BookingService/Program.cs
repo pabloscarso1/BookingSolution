@@ -31,6 +31,9 @@ builder.Services.AddInfrastructure(builder.Configuration);
 // Add FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
+// Add AutoMapper
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
+
 // Add API Versioning
 builder.Services.AddApiVersioning(options =>
 {

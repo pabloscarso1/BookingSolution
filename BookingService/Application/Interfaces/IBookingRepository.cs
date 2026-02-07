@@ -3,7 +3,7 @@ using BookingService.Application.Domain;
 
 namespace BookingService.Application.Interfaces
 {
-    public interface IBaseRepository
+    public interface IBookingRepository
     {
         Task AddAsync(Booking user);
         Task<Booking?> GetAsync(Expression<Func<Booking, bool>> filter);
