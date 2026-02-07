@@ -8,16 +8,20 @@
         public string Model { get; set; } = string.Empty;
         public int Year { get; set; }
         public string Color { get; set; } = string.Empty;
+        public decimal BookingCost { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         protected Vehicle() { }
 
-        public Vehicle(string patent, string model, int year, string color)
+        public Vehicle(Guid userId, string patent, string model, int year, string color, decimal bookingCost)
         {
+            Id = Guid.NewGuid();
+            UserId = userId;
             Patent = patent;
             Model = model;
             Year = year;
             Color = color;
+            BookingCost = bookingCost;
         }
 
         public Vehicle(Guid id, Guid usuarioId, string patent, string model, int year, string color)

@@ -27,6 +27,9 @@ namespace VehicleService.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<decimal>("BookingCost")
+                        .HasColumnType("numeric");
+
                     b.Property<string>("Color")
                         .IsRequired()
                         .HasColumnType("text");

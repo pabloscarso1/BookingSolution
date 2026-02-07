@@ -2,7 +2,7 @@
 
 namespace VehicleService.Api.Contracts
 {
-    public record CreateVehicleRequest(Guid UsuarioId, string Patent, string Model, int Year, string Color);
+    public record CreateVehicleRequest(Guid UserId, string Patent, string Model, int Year, string Color, decimal BookingCost);
 
     //public class CreateVehicleRequestValidator : AbstractValidator<CreateVehicleRequest>
     //{

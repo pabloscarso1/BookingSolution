@@ -2,12 +2,9 @@ using Asp.Versioning;
 using FluentValidation;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
-using Serilog;
-using System.IO.Compression;
 using System.Text;
 using VehicleService.Api.Configuration;
 using VehicleService.Api.Filters;
@@ -18,29 +15,9 @@ using VehicleService.Infraestructure;
 using VehicleService.Infraestructure.HealthCheck;
 using VehicleService.Infraestructure.Persistence;
 
-// Configurar Serilog
-Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(new ConfigurationBuilder()
-        .SetBasePath(Directory.GetCurrentDirectory())
-        .AddJsonFile("appsettings.json")
-        .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
-        .Build())
-    .CreateLogger();
+var builder = WebApplication.CreateBuilder(args);
 
-try
-{
-    Log.Information("Iniciando VehicleService...");
-
-    var builder = WebApplication.CreateBuilder(args);
-
-    // Configurar Serilog
-    builder.Host.UseSerilog();
-
-    // Configure CORS
-    var corsSettings = builder.Configuration.GetSection("Cors").Get<CorsSettings>() ?? new CorsSettings();
-    const string CorsPolicyName = "DefaultCorsPolicy";
-
-    // Add services to the container.
+// Add services to the container.
 
     builder.Services.AddControllers(options =>
     {
@@ -85,176 +62,102 @@ try
         options.SubstituteApiVersionInUrl = true;
     });
 
-    builder.Services.AddAuthentication("Bearer")
-    .AddJwtBearer("Bearer", options =>
+builder.Services.AddAuthentication("Bearer")
+.AddJwtBearer("Bearer", options =>
+{
+    var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+    var secretKey = jwtSettings["SecretKey"];
+    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+
+    options.TokenValidationParameters = new()
     {
-        var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-        var secretKey = jwtSettings["SecretKey"];
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = key,
+        ValidateIssuer = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidateAudience = true,
+        ValidAudience = jwtSettings["Audience"],
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.FromMinutes(5)
+    };
+});
 
-        options.TokenValidationParameters = new()
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = key,
-            ValidateIssuer = true,
-            ValidIssuer = jwtSettings["Issuer"],
-            ValidateAudience = true,
-            ValidAudience = jwtSettings["Audience"],
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.FromMinutes(5)
-        };
-    });
+builder.Services.AddAuthorization();
 
-    builder.Services.AddAuthorization();
+// Add Health Checks
+builder.Services.AddHealthChecks()
+    .AddCheck<DatabaseHealthCheck>("database", tags: new[] { "db", "sql" })
+    .AddCheck<MemoryHealthCheck>("memory", tags: new[] { "memory" });
 
-    // Add CORS
-    builder.Services.AddCors(options =>
+// Add Health Checks UI
+builder.Services.AddHealthChecksUI(options =>
+{
+    var healthChecksConfig = builder.Configuration.GetSection("HealthChecksUI");
+    var evaluationTime = healthChecksConfig.GetValue<int?>("EvaluationTimeInSeconds") ?? 30;
+    var maxHistory = healthChecksConfig.GetValue<int?>("MaximumHistoryEntriesPerEndpoint") ?? 50;
+    
+    options.SetEvaluationTimeInSeconds(evaluationTime);
+    options.MaximumHistoryEntriesPerEndpoint(maxHistory);
+    
+    // Leer endpoints desde configuración
+    var healthChecks = healthChecksConfig.GetSection("HealthChecks").Get<HealthCheckConfig[]>();
+    if (healthChecks != null)
     {
-        options.AddPolicy(CorsPolicyName, policy =>
+        foreach (var healthCheck in healthChecks)
         {
-            if (corsSettings.AllowAnyOrigin)
-            {
-                policy.AllowAnyOrigin()
-                      .AllowAnyMethod()
-                      .AllowAnyHeader();
-            }
-            else
-            {
-                policy.WithOrigins(corsSettings.AllowedOrigins)
-                      .AllowAnyMethod()
-                      .AllowAnyHeader();
-
-                if (corsSettings.AllowCredentials)
-                {
-                    policy.AllowCredentials();
-                }
-            }
-        });
-    });
-
-    // Add Health Checks
-    builder.Services.AddHealthChecks()
-        .AddCheck<DatabaseHealthCheck>("database", tags: new[] { "db", "sql" })
-        .AddCheck<MemoryHealthCheck>("memory", tags: new[] { "memory" });
-
-    // Add Health Checks UI
-    builder.Services.AddHealthChecksUI(options =>
-    {
-        var healthChecksConfig = builder.Configuration.GetSection("HealthChecksUI");
-        var evaluationTime = healthChecksConfig.GetValue<int?>("EvaluationTimeInSeconds") ?? 30;
-        var maxHistory = healthChecksConfig.GetValue<int?>("MaximumHistoryEntriesPerEndpoint") ?? 50;
-        
-        options.SetEvaluationTimeInSeconds(evaluationTime);
-        options.MaximumHistoryEntriesPerEndpoint(maxHistory);
-        
-        // Leer endpoints desde configuración
-        var healthChecks = healthChecksConfig.GetSection("HealthChecks").Get<HealthCheckConfig[]>();
-        if (healthChecks != null)
-        {
-            foreach (var healthCheck in healthChecks)
-            {
-                options.AddHealthCheckEndpoint(healthCheck.Name, healthCheck.Uri);
-            }
+            options.AddHealthCheckEndpoint(healthCheck.Name, healthCheck.Uri);
         }
-    })
-    .AddInMemoryStorage();
-
-    // Add Response Compression
-    builder.Services.AddResponseCompression(options =>
-    {
-        options.EnableForHttps = true; // Habilitar compresión para HTTPS
-        options.Providers.Add<BrotliCompressionProvider>();
-        options.Providers.Add<GzipCompressionProvider>();
-
-        // Tipos MIME a comprimir
-        options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
-        {
-        "application/json",
-        "application/xml",
-        "text/plain",
-        "text/css",
-        "text/html",
-        "application/javascript",
-        "text/json"
-        });
-    });
-
-    // Configurar niveles de compresión
-    builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
-    {
-        options.Level = CompressionLevel.Fastest; // Fastest, Optimal, SmallestSize
-    });
-
-    builder.Services.Configure<GzipCompressionProviderOptions>(options =>
-    {
-        options.Level = CompressionLevel.Fastest;
-    });
-
-    var app = builder.Build();
-
-    // Response Compression debe ir primero (antes de otros middlewares)
-    app.UseResponseCompression();
-
-    // Configure request logging middleware (debe ir primero para capturar todo)
-    app.UseRequestLogging();
-
-    // Configure global exception handling middleware
-    app.UseGlobalExceptionHandling();
-
-    // Configure the HTTP request pipeline.
-    //if (app.Environment.IsDevelopment())
-    //{
-        app.UseSwagger();
-        app.UseSwaggerUI();
-    //}
-
-    app.UseHttpsRedirection();
-
-    // CORS debe ir después de UseRouting y antes de UseAuthorization
-    app.UseCors(CorsPolicyName);
-
-    app.UseAuthorization();
-
-    app.MapControllers();
-
-    // Health Check Endpoints
-    app.MapHealthChecks("/health", new HealthCheckOptions
-    {
-        Predicate = _ => true,
-        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-    });
-
-    app.MapHealthChecks("/health/ready", new HealthCheckOptions
-    {
-        Predicate = check => check.Tags.Contains("ready"),
-        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-    });
-
-    app.MapHealthChecks("/health/live", new HealthCheckOptions
-    {
-        Predicate = _ => false, // No ejecuta checks, solo verifica que la app responde
-        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-    });
-
-    // Health Checks UI
-    app.MapHealthChecksUI(options =>
-    {
-        options.UIPath = "/health-ui";
-    });
-
-    using (var scope = app.Services.CreateScope())
-    {
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        db.Database.Migrate();
     }
+})
+.AddInMemoryStorage();
 
-    app.Run();
-}
-catch (Exception ex)
+var app = builder.Build();
+
+// Configure request logging middleware (debe ir primero para capturar todo)
+app.UseRequestLogging();
+
+// Configure global exception handling middleware
+app.UseGlobalExceptionHandling();
+
+// Configure the HTTP request pipeline.
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+// Health Check Endpoints
+app.MapHealthChecks("/health", new HealthCheckOptions
 {
-    Log.Fatal(ex, "La aplicación terminó inesperadamente");
-}
-finally
+    Predicate = _ => true,
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
 {
-    Log.CloseAndFlush();
+    Predicate = check => check.Tags.Contains("ready"),
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = _ => false, // No ejecuta checks, solo verifica que la app responde
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+
+// Health Checks UI
+app.MapHealthChecksUI(options =>
+{
+    options.UIPath = "/health-ui";
+});
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
 }
+
+app.Run();

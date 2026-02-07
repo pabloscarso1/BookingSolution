@@ -5,7 +5,7 @@ using VehicleService.Application.Interfaces;
 
 namespace VehicleService.Application.Features.CreateVehicle
 {
-    public record CreateVehicleCommand(Guid UsuarioId, string Patent, string Model, int Year, string Color);
+    public record CreateVehicleCommand(Guid UserId, string Patent, string Model, int Year, string Color, decimal BookingCost);
 
     public class CreateVehicleHandler
     {
@@ -28,12 +28,12 @@ namespace VehicleService.Application.Features.CreateVehicle
             // Validar el comando
             return await _validator.ValidateAndExecuteAsync(command, async () =>
             {
-                var existing = _repository.GetAsync(x => x.Patent == command.Patent);
+                var existing = await _repository.GetAsync(x => x.Patent == command.Patent);
 
                 if (existing is not null)
                     return Result<VehicleDto>.Failure("VEHICLE_ALREADY_EXISTS");
 
-                var vehicle = new Domain.Vehicle(command.Patent, command.Model, command.Year, command.Color);
+                var vehicle = new Domain.Vehicle(command.UserId, command.Patent, command.Model, command.Year, command.Color, command.BookingCost);
 
                 await _repository.AddAsync(vehicle);
                 await _unitOfWork.SaveChangesAsync();
@@ -48,7 +48,7 @@ namespace VehicleService.Application.Features.CreateVehicle
     {
         public CreateVehicleCommandValidator()
         {
-            RuleFor(x => x.UsuarioId)
+            RuleFor(x => x.UserId)
                .NotEmpty()
                .WithMessage("El usuario es requerido");
 
