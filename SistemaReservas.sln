@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "ApiGateway\Ap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookingService", "BookingService\BookingService.csproj", "{8F78388B-EE6D-9258-1F75-114269D8589C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{7463AE03-9FD4-4720-84F8-90F3A157AEB9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{8F78388B-EE6D-9258-1F75-114269D8589C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F78388B-EE6D-9258-1F75-114269D8589C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F78388B-EE6D-9258-1F75-114269D8589C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7463AE03-9FD4-4720-84F8-90F3A157AEB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7463AE03-9FD4-4720-84F8-90F3A157AEB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7463AE03-9FD4-4720-84F8-90F3A157AEB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7463AE03-9FD4-4720-84F8-90F3A157AEB9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

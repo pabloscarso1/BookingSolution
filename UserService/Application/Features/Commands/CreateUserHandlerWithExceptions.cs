@@ -1,8 +1,8 @@
 using FluentValidation;
-using UserService.Application.Common;
+using Common.Application.Common;
 using UserService.Application.Domain;
 using UserService.Application.Dtos;
-using UserService.Application.Exceptions;
+using Common.Application.Exceptions;
 using UserService.Application.Interfaces;
 
 namespace UserService.Application.Features.CreateUser

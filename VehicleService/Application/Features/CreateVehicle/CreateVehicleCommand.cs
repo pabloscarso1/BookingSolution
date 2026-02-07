@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using VehicleService.Application.Common;
+using Common.Application.Common;
 using VehicleService.Application.Dtos;
 using VehicleService.Application.Interfaces;
 

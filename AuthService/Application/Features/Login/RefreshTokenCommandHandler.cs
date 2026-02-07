@@ -1,4 +1,4 @@
-using AuthService.Application.Common;
+using Common.Application.Common;
 using AuthService.Application.Dtos;
 using AuthService.Application.Interfaces;
 using AuthService.Application.Services;

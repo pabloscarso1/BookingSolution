@@ -1,5 +1,5 @@
 using FluentValidation;
-using AuthService.Application.Common;
+using Common.Application.Common;
 using AuthService.Application.Dtos;
 using AuthService.Application.ExternalServices;
 using AuthService.Application.Interfaces;

@@ -1,8 +1,8 @@
 using Asp.Versioning;
-using BookingService.Api.Configuration;
-using BookingService.Api.Filters;
-using BookingService.Api.HealthChecks;
-using BookingService.Api.Middleware;
+using Common.Api.Configuration;
+using Common.Api.Filters;
+using Common.Api.HealthChecks;
+using Common.Api.Middleware;
 using BookingService.Application;
 using BookingService.Infraestructure;
 using BookingService.Infraestructure.HealthCheck;

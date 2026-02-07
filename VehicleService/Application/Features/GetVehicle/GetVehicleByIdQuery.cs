@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using VehicleService.Application.Common;
+using Common.Application.Common;
 using VehicleService.Application.Dtos;
-using VehicleService.Application.Exceptions;
+using Common.Application.Exceptions;
 using VehicleService.Application.Interfaces;
 
 namespace VehicleService.Application.Features.GetVehicle

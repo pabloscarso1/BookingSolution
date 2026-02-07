@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using UserService.Application.Common;
+using Common.Application.Common;
 using UserService.Application.Dtos;
 using UserService.Application.Interfaces;
 

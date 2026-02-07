@@ -1,8 +1,8 @@
 using Asp.Versioning;
-using BaseService.Api.Configuration;
-using BaseService.Api.Filters;
-using BaseService.Api.HealthChecks;
-using BaseService.Api.Middleware;
+using Common.Api.Configuration;
+using Common.Api.Filters;
+using Common.Api.HealthChecks;
+using Common.Api.Middleware;
 using BaseService.Application;
 using BaseService.Infraestructure;
 using BaseService.Infraestructure.HealthCheck;

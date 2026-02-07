@@ -35,4 +35,29 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Api\Configuration\CorsSettings.cs" />
+    <Compile Remove="Api\Configuration\HealthCheckConfig.cs" />
+    <Compile Remove="Api\Filters\ValidationFilter.cs" />
+    <Compile Remove="Api\HealthCheck\MemoryHealthCheck.cs" />
+    <Compile Remove="Api\Middleware\ErrorResponse.cs" />
+    <Compile Remove="Api\Middleware\ExceptionHandlingMiddleware.cs" />
+    <Compile Remove="Api\Middleware\ExceptionHandlingMiddlewareExtensions.cs" />
+    <Compile Remove="Api\Middleware\RequestLoggingMiddleware.cs" />
+    <Compile Remove="Api\Middleware\RequestLoggingMiddlewareExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Application\Common\Result.cs" />
+    <Compile Remove="Application\Common\ValidatorExtensions.cs" />
+    <Compile Remove="Application\Exceptions\BusinessRuleException.cs" />
+    <Compile Remove="Application\Exceptions\ConflictException.cs" />
+    <Compile Remove="Application\Exceptions\DomainException.cs" />
+    <Compile Remove="Application\Exceptions\NotFoundException.cs" />
+  </ItemGroup>
+
 </Project>
